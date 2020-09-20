@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import MagicMock, patch
 
 from lib.service_type import ServiceType
 
@@ -46,6 +47,32 @@ class TestServiceType(unittest.TestCase):
         st2 = ServiceType("Traditional", type_id="54321")
 
         self.assertNotEqual(st1, st2)
+
+    def test_hash(self):
+        """ServiceType.__hash__"""
+        st = ServiceType("Traditional", type_id="12345")
+
+        self.assertEqual(hash(st), hash("12345"))
+
+    @patch("lib.service_type.ServiceType.get_by_name")
+    def test_id_populated(self, m_get_by_name):
+        """ServiceType.id.populated"""
+        st = ServiceType("Traditional", type_id="12345")
+
+        self.assertEqual(st.id, "12345")
+        m_get_by_name.assert_not_called()
+
+    @patch("lib.service_type.ServiceType.get_by_name")
+    def test_id_unpopulated(self, m_get_by_name):
+        """ServiceType.id.unpopulated"""
+        st = ServiceType("Traditional")
+        st_from_rest = MagicMock()
+        st_from_rest._id = "12345"
+
+        m_get_by_name.return_value = st_from_rest
+
+        self.assertEqual(st.id, "12345")
+        m_get_by_name.assert_called_with("Traditional")
 
 
 if __name__ == '__main__':

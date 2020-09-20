@@ -17,13 +17,16 @@ class ServiceType:
     def __eq__(self, other):
         return self.id == other.id
 
+    def __hash__(self):
+        return hash(self.id)
+
     @property
     def id(self):
         if self._id:
             return self._id
 
         full_type = ServiceType.get_by_name(self.name)
-        self._id = full_type.id
+        self._id = full_type._id
         return self._id
 
     @staticmethod
