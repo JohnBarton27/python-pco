@@ -30,6 +30,15 @@ class ServiceType:
         return self._id
 
     @staticmethod
+    def get_by_id(type_id: str):
+        all_types = ServiceType.get_all()
+        for service_type in all_types:
+            if service_type.id == type_id:
+                return service_type
+
+        return None
+
+    @staticmethod
     def get_by_name(name: str):
         all_types = ServiceType.get_all()
         for service_type in all_types:

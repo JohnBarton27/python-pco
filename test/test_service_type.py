@@ -80,6 +80,30 @@ class TestServiceType(unittest.TestCase):
         m_get_by_name.assert_called_with("Traditional")
 
     @patch("lib.service_type.ServiceType.get_all")
+    def test_get_by_id_found(self, m_get_all):
+        """ServiceType.get_by_id.found"""
+        st1 = ServiceType("Traditional", type_id="001")
+        st2 = ServiceType("Gathering", type_id="002")
+        st3 = ServiceType("Special Event", type_id="003")
+
+        m_get_all.return_value = [st1, st2, st3]
+
+        st = ServiceType.get_by_id("002")
+        self.assertEqual(st, st2)
+
+    @patch("lib.service_type.ServiceType.get_all")
+    def test_get_by_id_not_found(self, m_get_all):
+        """ServiceType.get_by_id.not_found"""
+        st1 = ServiceType("Traditional", type_id="001")
+        st2 = ServiceType("Gathering", type_id="002")
+        st3 = ServiceType("Special Event", type_id="003")
+
+        m_get_all.return_value = [st1, st2, st3]
+
+        st = ServiceType.get_by_id("012")
+        self.assertIsNone(st)
+
+    @patch("lib.service_type.ServiceType.get_all")
     def test_get_by_name_found(self, m_get_all):
         """ServiceType.get_by_name.found"""
         st1 = ServiceType("Traditional", type_id="001")
