@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from lib.planning_center import PlanningCenter
 
 
@@ -28,6 +30,20 @@ class ServiceType:
         full_type = ServiceType.get_by_name(self.name)
         self._id = full_type._id
         return self._id
+
+    def get_next_plan(self):
+        from lib.plan import Plan
+        now = datetime.now()
+
+        prev_plan = None
+        plans = PlanningCenter.PCO.iterate(
+            "/services/v2/service_types/{}/plans?order=-sort_date".format(self.id))
+        while True:
+            plan = Plan.get_from_json(next(plans)["data"])
+            if plan.start < now:
+                return prev_plan
+
+            prev_plan = plan
 
     @staticmethod
     def get_by_id(type_id: str):

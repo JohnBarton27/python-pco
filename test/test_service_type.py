@@ -1,3 +1,5 @@
+from datetime import datetime
+from freezegun import freeze_time
 import unittest
 from unittest.mock import call, MagicMock, patch
 
@@ -78,6 +80,31 @@ class TestServiceType(unittest.TestCase):
 
         self.assertEqual(st.id, "12345")
         m_get_by_name.assert_called_with("Traditional")
+
+    @patch("lib.plan.Plan.get_from_json")
+    @freeze_time("2020-09-18")
+    def test_get_next_plan(self, m_plan_from_json):
+        st = ServiceType("Traditional", type_id="001")
+
+        json1 = {"data": {"name": "json1"}}
+        json2 = {"data": {"name": "json2"}}
+        json3 = {"data": {"name": "json3"}}
+        self.m_pco.iterate.return_value = iter([json1, json2, json3])
+
+        plan1 = MagicMock()
+        plan1.start = datetime(year=2020, month=9, day=27)
+        plan2 = MagicMock()
+        plan2.start = datetime(year=2020, month=9, day=20)
+        plan3 = MagicMock()
+        plan3.start = datetime(year=2020, month=9, day=13)
+
+        m_plan_from_json.side_effect = [plan1, plan2, plan3]
+
+        next_plan = st.get_next_plan()
+
+        m_plan_from_json.assert_has_calls([call({"name": "json1"}), call({"name": "json2"})])
+
+        self.assertEqual(next_plan, plan2)
 
     @patch("lib.service_type.ServiceType.get_all")
     def test_get_by_id_found(self, m_get_all):
