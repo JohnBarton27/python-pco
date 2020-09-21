@@ -127,6 +127,22 @@ class TestServiceType(unittest.TestCase):
         self.assertTrue(st1 in s_types)
         self.assertTrue(st2 in s_types)
 
+    def test_get_from_json(self):
+        """ServiceType.get_from_json"""
+        json = {
+            "id": "001",
+            "attributes": {
+                "name": "Traditional",
+                "frequency": "Weekly"
+            }
+        }
+
+        st = ServiceType.get_from_json(json)
+
+        self.assertEqual(st.id, "001")
+        self.assertEqual(st.name, "Traditional")
+        self.assertEqual(st.frequency, "Weekly")
+
 
 if __name__ == '__main__':
     unittest.main()
