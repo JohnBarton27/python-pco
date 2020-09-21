@@ -1,10 +1,15 @@
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import call, MagicMock, patch
 
 from lib.service_type import ServiceType
 
 
 class TestServiceType(unittest.TestCase):
+
+    def setUp(self) -> None:
+        mock_pco = patch("lib.planning_center.PlanningCenter.PCO")
+        self.m_pco = mock_pco.start()
+        self.addCleanup(mock_pco.stop)
 
     def test_init_minimal(self):
         """ServiceType.__init__.minimal"""
@@ -97,6 +102,30 @@ class TestServiceType(unittest.TestCase):
 
         st = ServiceType.get_by_name("Other")
         self.assertIsNone(st)
+
+    @patch("lib.service_type.ServiceType.get_from_json")
+    def test_get_all(self, m_get_from_json):
+        """ServiceType.get_all"""
+        self.m_pco.get.return_value = {
+            "data": [
+                {"name": "json1"},
+                {"name": "json2"}
+            ]
+        }
+
+        st1 = MagicMock()
+        st2 = MagicMock()
+
+        m_get_from_json.side_effect = [st1, st2]
+
+        s_types = ServiceType.get_all()
+
+        m_get_from_json.assert_has_calls([call({"name": "json1"}),
+                                          call({"name": "json2"})])
+
+        self.assertEqual(len(s_types), 2)
+        self.assertTrue(st1 in s_types)
+        self.assertTrue(st2 in s_types)
 
 
 if __name__ == '__main__':
