@@ -1,11 +1,17 @@
 from datetime import datetime
 import unittest
+from unittest.mock import MagicMock, patch
 
 from lib.plan import Plan
 from lib.service_type import ServiceType
 
 
 class TestPlan(unittest.TestCase):
+
+    def setUp(self) -> None:
+        type_by_id_patch = patch("lib.plan.ServiceType.get_by_id")
+        self.m_type_by_id = type_by_id_patch.start()
+        self.addCleanup(type_by_id_patch.stop)
 
     def test_init_minimal(self):
         """Plan.__init__.minimal"""
@@ -78,6 +84,35 @@ class TestPlan(unittest.TestCase):
         plan = Plan(start, st, "123")
 
         self.assertEqual(hash(plan), hash("123"))
+
+    def test_get_from_json(self):
+        """Plan.get_from_json"""
+        json = {
+            "attributes": {
+                "sort_date": "2020-09-20T09:30:00Z",
+                "title": "A service"
+            },
+            "relationships": {
+                "service_type": {
+                    "data": {
+                        "id": "001"
+                    }
+                }
+            },
+            "id": "123456"
+        }
+
+        s_type = MagicMock()
+        self.m_type_by_id.return_value = s_type
+
+        plan = Plan.get_from_json(json)
+
+        self.m_type_by_id.assert_called_with("001")
+
+        self.assertEqual(plan.start, datetime(year=2020, month=9, day=20, hour=9, minute=30))
+        self.assertEqual(plan.type, s_type)
+        self.assertEqual(plan.id, "123456")
+        self.assertEqual(plan.title, "A service")
 
 
 if __name__ == '__main__':

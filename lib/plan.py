@@ -28,3 +28,16 @@ class Plan:
 
     def __hash__(self):
         return hash(self.id)
+
+    @staticmethod
+    def get_from_json(json: dict):
+        start_str = json["attributes"]["sort_date"]
+        start = datetime.strptime(start_str, "%Y-%m-%dT%H:%M:%SZ")
+
+        service_type_id = json["relationships"]["service_type"]["data"]["id"]
+        service_type = ServiceType.get_by_id(service_type_id)
+
+        plan_id = json["id"]
+        title = json["attributes"]["title"]
+
+        return Plan(start, service_type, plan_id, title=title)
