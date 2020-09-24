@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from lib.item import Item
+from lib.planning_center import PlanningCenter
 from lib.service_type import ServiceType
 
 
@@ -28,6 +30,14 @@ class Plan:
 
     def __hash__(self):
         return hash(self.id)
+
+    def get_items(self):
+        items_json = PlanningCenter.PCO.get("/services/v2/service_types/{}/plans/{}/items".format(self.type.id, self.id))
+        items = []
+        for item_json in items_json["data"]:
+            items.append(Item.get_from_json(item_json))
+
+        return items
 
     @staticmethod
     def get_from_json(json: dict):

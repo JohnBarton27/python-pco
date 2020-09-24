@@ -1,6 +1,6 @@
 from datetime import datetime
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import call, MagicMock, patch
 
 from lib.plan import Plan
 from lib.service_type import ServiceType
@@ -12,6 +12,10 @@ class TestPlan(unittest.TestCase):
         type_by_id_patch = patch("lib.plan.ServiceType.get_by_id")
         self.m_type_by_id = type_by_id_patch.start()
         self.addCleanup(type_by_id_patch.stop)
+
+        mock_pco = patch("lib.planning_center.PlanningCenter.PCO")
+        self.m_pco = mock_pco.start()
+        self.addCleanup(mock_pco.stop)
 
     def test_init_minimal(self):
         """Plan.__init__.minimal"""
@@ -84,6 +88,34 @@ class TestPlan(unittest.TestCase):
         plan = Plan(start, st, "123")
 
         self.assertEqual(hash(plan), hash("123"))
+
+    @patch("lib.plan.Item.get_from_json")
+    def test_get_items(self, m_item_from_json):
+        """Plan.get_items"""
+        start = datetime(year=2020, month=9, day=20)
+        st = ServiceType("The Gathering", type_id="001")
+        plan = Plan(start, st, "123")
+
+        item1 = MagicMock()
+        item2 = MagicMock()
+
+        self.m_pco.get.return_value = {
+            "data": [
+                {"name": "item1"},
+                {"name": "item2"}
+            ]
+        }
+
+        m_item_from_json.side_effect = [item1, item2]
+
+        items = plan.get_items()
+
+        self.m_pco.get.assert_called_with("/services/v2/service_types/001/plans/123/items")
+        m_item_from_json.assert_has_calls([call({"name": "item1"}), call({"name": "item2"})])
+
+        self.assertEqual(len(items), 2)
+        self.assertTrue(item1 in items)
+        self.assertTrue(item2 in items)
 
     def test_get_from_json(self):
         """Plan.get_from_json"""
