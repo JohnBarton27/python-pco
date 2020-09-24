@@ -27,17 +27,19 @@ class TestPlan(unittest.TestCase):
         self.assertEqual(plan.type, st)
         self.assertEqual(plan.id, "123")
         self.assertIsNone(plan.title)
+        self.assertIsNone(plan.series_title)
 
     def test_init_full(self):
         """Plan.__init__.minimal"""
         start = datetime(year=2020, month=9, day=20)
         st = ServiceType("The Gathering", type_id="001")
-        plan = Plan(start, st, "123", "A service")
+        plan = Plan(start, st, "123", "A service", "Series Title")
 
         self.assertEqual(plan.start, datetime(year=2020, month=9, day=20))
         self.assertEqual(plan.type, st)
         self.assertEqual(plan.id, "123")
         self.assertEqual(plan.title, "A service")
+        self.assertEqual(plan.series_title, "Series Title")
 
     def test_str_title(self):
         """Plan.__str__.title"""
@@ -122,7 +124,8 @@ class TestPlan(unittest.TestCase):
         json = {
             "attributes": {
                 "sort_date": "2020-09-20T09:30:00Z",
-                "title": "A service"
+                "title": "A service",
+                "series_title": "Series Title"
             },
             "relationships": {
                 "service_type": {
@@ -145,6 +148,7 @@ class TestPlan(unittest.TestCase):
         self.assertEqual(plan.type, s_type)
         self.assertEqual(plan.id, "123456")
         self.assertEqual(plan.title, "A service")
+        self.assertEqual(plan.series_title, "Series Title")
 
 
 if __name__ == '__main__':

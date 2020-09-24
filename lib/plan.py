@@ -10,11 +10,13 @@ class Plan:
     def __init__(self, start: datetime,
                  plan_type: ServiceType,
                  plan_id: str,
-                 title: str = None):
+                 title: str = None,
+                 series_title: str = None):
         self.start = start
         self.type = plan_type
         self.id = plan_id
         self.title = title
+        self.series_title = series_title
 
     def __str__(self):
         if self.title:
@@ -49,5 +51,6 @@ class Plan:
 
         plan_id = json["id"]
         title = json["attributes"]["title"]
+        series_title = json["attributes"]["series_title"]
 
-        return Plan(start, service_type, plan_id, title=title)
+        return Plan(start, service_type, plan_id, title=title, series_title=series_title)
