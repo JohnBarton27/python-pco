@@ -6,14 +6,25 @@ from lib.item import Item
 
 class TestItem(unittest.TestCase):
 
-    def test_init(self):
-        """Item.__init__"""
+    def test_init_minimal(self):
+        """Item.__init__.minimal"""
         item = Item("A Song", "song", "123456", timedelta(minutes=2))
 
         self.assertEqual(item.title, "A Song")
         self.assertEqual(item.type, "song")
         self.assertEqual(item.id, "123456")
         self.assertEqual(item.length, timedelta(minutes=2))
+        self.assertIsNone(item.description)
+
+    def test_init_full(self):
+        """Item.__init__.full"""
+        item = Item("A Song", "song", "123456", timedelta(minutes=2), description="Description")
+
+        self.assertEqual(item.title, "A Song")
+        self.assertEqual(item.type, "song")
+        self.assertEqual(item.id, "123456")
+        self.assertEqual(item.length, timedelta(minutes=2))
+        self.assertEqual(item.description, "Description")
 
     def test_str(self):
         """Item.__str__"""
@@ -53,7 +64,8 @@ class TestItem(unittest.TestCase):
             "attributes": {
                 "title": "A sermon",
                 "item_type": "item",
-                "length": 120
+                "length": 120,
+                "description": "A description"
             },
             "id": "123456"
         }
@@ -64,6 +76,7 @@ class TestItem(unittest.TestCase):
         self.assertEqual(item.type, "item")
         self.assertEqual(item.length, timedelta(minutes=2))
         self.assertEqual(item.id, "123456")
+        self.assertEqual(item.description, "A description")
 
 
 if __name__ == '__main__':

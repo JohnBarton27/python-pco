@@ -3,11 +3,12 @@ from datetime import timedelta
 
 class Item:
 
-    def __init__(self, title: str, item_type: str, item_id: str, length: timedelta):
+    def __init__(self, title: str, item_type: str, item_id: str, length: timedelta, description: str = None):
         self.title = title
         self.type = item_type
         self.id = item_id
         self.length = length
+        self.description = description
 
     def __str__(self):
         return "[{}] {} ({})".format(self.type, self.title, self.length)
@@ -27,5 +28,6 @@ class Item:
         item_type = json["attributes"]["item_type"]
         item_id = json["id"]
         length_seconds = json["attributes"]["length"]
+        description = json["attributes"]["description"]
 
-        return Item(title, item_type, item_id, timedelta(seconds=length_seconds))
+        return Item(title, item_type, item_id, timedelta(seconds=length_seconds), description=description)
