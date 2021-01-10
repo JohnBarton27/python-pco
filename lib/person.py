@@ -22,6 +22,12 @@ class Person:
     def __hash__(self):
         return hash(self.id)
 
+    def get_plan_person(self):
+        plan_person_json = PlanningCenter.PCO.get(f"/services/v2/people/{self.id}/plan_people")
+        import pprint
+        pp = pprint.PrettyPrinter(indent=4)
+        pp.pprint(plan_person_json)
+
     @staticmethod
     def get_from_json(json: dict):
         person_id = json["id"]
@@ -44,3 +50,13 @@ class Person:
             people += Person.get_all(page+1, per_page=per_page)
 
         return people
+
+    @staticmethod
+    def get_by_name(name: str):
+        all_people = Person.get_all()
+
+        for person in all_people:
+            if person.name == name:
+                return person
+
+        print(f"Could not find user with name {name}")

@@ -3,6 +3,7 @@ from datetime import datetime
 from lib.item import Item
 from lib.planning_center import PlanningCenter
 from lib.service_type import ServiceType
+from lib.team_member import TeamMember
 
 
 class Plan:
@@ -40,6 +41,16 @@ class Plan:
             items.append(Item.get_from_json(item_json))
 
         return items
+
+    def get_team_members(self):
+        team_members = []
+        team_members_json = PlanningCenter.PCO.get(
+            f"/services/v2/service_types/{self.type.id}/plans/{self.id}/team_members")['data']
+
+        for team_member_json in team_members_json:
+            team_members.append(TeamMember.get_from_json(team_member_json))
+
+        return team_members
 
     @staticmethod
     def get_from_json(json: dict):
