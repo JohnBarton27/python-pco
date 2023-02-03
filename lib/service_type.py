@@ -34,6 +34,8 @@ class ServiceType:
     def get_next_plan(self):
         from lib.plan import Plan
         now = datetime.now()
+        from datetime import timedelta
+        now = now - timedelta(days=1)
 
         prev_plan = None
         plans = PlanningCenter.PCO.iterate(
